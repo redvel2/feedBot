@@ -16,7 +16,7 @@ from settings import *
 
 import feedparser
 from findfeeds import FeedsExtractor
-from newsworker.extractor import tractor
+#from newsworker.extractor import tractor
 
 
 requests.adapters.DEFAULT_RETRIES = 5
@@ -284,8 +284,8 @@ def do_update(bot, update):
 
 def start():
     connect('feedrebot', host='127.0.0.1', port=27017)
-
-    updater = Updater(open(BOT_KEY, 'r').read())
+    KEY = open(BOT_KEY, 'r').read().replace("\n", "")
+    updater = Updater(KEY)
     updater.dispatcher.add_handler(CommandHandler('help', helpcmd))
     updater.dispatcher.add_handler(CommandHandler('start', helpcmd))
     updater.dispatcher.add_handler(CommandHandler('test', do_test))

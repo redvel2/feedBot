@@ -23,7 +23,7 @@ handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, backupCount=50, max
 logger.addHandler(handler)
 
 
-BOT_KEY = '/.key_newsbot'
+BOT_KEY = '.key_newsbot'
 
 # Number of entries in one digest
 DIGEST_LIMIT = 10
@@ -40,4 +40,4 @@ PYTHON_EXEC = 'python3'
 MONGO_HOST = 'localhost'
 MONGO_PORT = 27017
 
-USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
