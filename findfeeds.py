@@ -9,6 +9,7 @@ from lxml.html import fromstring
 import feedparser
 from pprint import pprint
 import time
+import traceback
 
 def decode_html(html_string):
     converted = UnicodeDammit(html_string, isHTML=True)
@@ -48,7 +49,7 @@ class FeedsExtractor:
             f.close()
             root = fromstring(data)
         except urllib.error.HTTPError:
-            pass
+            traceback.format_exc()
         return root, realurl
 
     def __find_rss_autodiscover(self, root, url):
