@@ -16,6 +16,7 @@ from settings import *
 
 import feedparser
 from findfeeds import FeedsExtractor
+from newsworker.extractor import FeedExtractor
 #from newsworker.extractor import tractor
 
 
