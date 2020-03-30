@@ -84,7 +84,7 @@ def __verify_feed(url, update=None):
                 return feeds
             bot_logdebug(update, 'Проверяем на наличие новостей в теле HTML страницы')
             ext = FeedExtractor(filtered_text_length=150)
-            data, session = ext.get_rss(url)
+            data, session = ext.get_feed(url)
             logging.info(data)
             if data and len(data['items']) > 0:
                 feeds.append({'feedtype' : FEED_TYPE_HTML, 'title' : data['title'], 'num' : len(data['items']), 'url' : url})
