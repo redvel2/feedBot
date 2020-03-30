@@ -244,7 +244,7 @@ class FeedsExtractor:
                     d = feedparser.parse(cf['url'])
                     if 'title' in d.feed:
                         items.append(cf)
-            time.sleep(self.config.throttle)
+            time.sleep(self.config["throttle"])
         results['items'] = items
         return results
 
