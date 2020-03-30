@@ -57,7 +57,7 @@ def __verify_feed(url, update=None):
         logging.info(str(afeeds))
         if 'items' not in afeeds.keys():
             bot_logdebug(update, 'RSS ленты не обнаружены. Проверяем наличие новостей на странице')
-            ext = FeedExtractor(filtered_text_length=150)
+            f = FeedExtractor(filtered_text_length=150)
             data, session = f.get_feed(url)
             logging.info(data)
             if data and len(data['items']) > 0:

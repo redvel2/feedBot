@@ -35,7 +35,7 @@ class FeedsExtractor:
                 result_config[k] = config[k]
         return result_config
 
-    def __init__(self, config):
+    def __init__(self, config=None):
         self.config = FeedsExtractor.init_config(config)
 
     def __get_page(self, url):
