@@ -24,13 +24,13 @@ class FeedsExtractor:
     }
 
 
-    @static
+    @staticmethod
     def init_config(config):
         config = config or {}
         result_config = {}
         result_config.update(FeedsExtractor.DEFAULT_CONFIG)
 
-        for k in default_config:
+        for k in result_config.keys():
             if config.get(k) is not None:
                 result_config[k] = config[k]
         return result_config
