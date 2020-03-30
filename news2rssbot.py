@@ -52,7 +52,7 @@ def __verify_feed(url, update=None):
     feeds = []
     if ctype == 'text/html':
         bot_logdebug(update, 'Обнаружен тип документ: HTML страница')
-        afeeds = FeedsExtractor().find_feeds_deep(url)
+        afeeds = FeedsExtractor({"throttle": THROTTLE_INTERVAL}).find_feeds_deep(url)
         logging.info(str(afeeds))
         if 'items' not in afeeds.keys():
             bot_logdebug(update, 'RSS ленты не обнаружены. Проверяем наличие новостей на странице')

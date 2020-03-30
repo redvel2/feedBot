@@ -8,7 +8,7 @@ from bs4 import UnicodeDammit
 from lxml.html import fromstring
 import feedparser
 from pprint import pprint
-
+import time
 
 def decode_html(html_string):
     converted = UnicodeDammit(html_string, isHTML=True)
@@ -18,16 +18,37 @@ def decode_html(html_string):
 
 
 class FeedsExtractor:
-    def __init__(self):
-        pass
+
+    DEFAULT_CONFIG = {
+        "throttle": 0
+    }
+
+
+    @static
+    def init_config(config):
+        config = config or {}
+        result_config = {}
+        result_config.update(FeedsExtractor.DEFAULT_CONFIG)
+
+        for k in default_config:
+            if config.get(k) is not None:
+                result_config[k] = config[k]
+        return result_config
+
+    def __init__(self, config):
+        self.config = FeedsExtractor.init_config(config)
 
     def __get_page(self, url):
         realurl = None
-        f = urllib.request.urlopen(url)
-        data = f.read()
-        realurl = f.geturl()
-        f.close()
-        root = fromstring(data)
+        root = None
+        try:
+            f = urllib.request.urlopen(url)
+            data = f.read()
+            realurl = f.geturl()
+            f.close()
+            root = fromstring(data)
+        except urllib.error.HTTPError:
+            pass
         return root, realurl
 
     def __find_rss_autodiscover(self, root, url):
@@ -223,6 +244,7 @@ class FeedsExtractor:
                     d = feedparser.parse(cf['url'])
                     if 'title' in d.feed:
                         items.append(cf)
+            time.sleep(self.config.throttle)
         results['items'] = items
         return results
 
