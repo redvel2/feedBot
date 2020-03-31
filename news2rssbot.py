@@ -290,7 +290,7 @@ def do_set(bot, update):
 
 def do_update(bot, update):
     user = __get_user(update)
-    bot_logdebug(update, 'Запуск сбора новостей')
+    bot_logdebug(update, 'Выбран пользователь id: @{0}. Запуск сбора новостей'.format(user.userid))
     os.system('%s news2rsscmd.py collect %s' % (PYTHON_EXEC, user.userid))
     bot_logdebug(update, 'Запуск отправки новостей по каналам')
     os.system('%s news2rsscmd.py digest %s' % (PYTHON_EXEC, user.userid))
