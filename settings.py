@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 import logging.handlers
+import pathlib
+from os import path
 #logging.basicConfig(
 #        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 #        level=logging.DEBUG)
@@ -9,6 +11,7 @@ import logging.handlers
 
 
 LOG_FILENAME = 'feedrebot.log'
+PROJECT_DIR = pathlib.Path().absolute()
 
 # Set up a specific logger with our desired output level
 logger = logging.getLogger()
@@ -18,12 +21,12 @@ logger.setLevel(logging.DEBUG)
 #needRoll = os.path.isfile(LOG_FILENAME)
 
 # Add the log message handler to the logger
-handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, backupCount=50, maxBytes=10000000)
+handler = logging.handlers.RotatingFileHandler(path.join(PROJECT_DIR, LOG_FILENAME), backupCount=50, maxBytes=10000000)
 
 logger.addHandler(handler)
 
-
-BOT_KEY = '.key_newsbot'
+BOT_KEY_FILE = '.key_newsbot'
+BOT_KEY = path.join(PROJECT_DIR, BOT_KEY_FILE)
 
 # Number of entries in one digest
 DIGEST_LIMIT = 10
