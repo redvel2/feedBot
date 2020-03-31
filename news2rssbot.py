@@ -18,6 +18,7 @@ import feedparser
 from findfeeds import FeedsExtractor
 from newsworker.extractor import FeedExtractor
 #from newsworker.extractor import tractor
+from utils import tg_id2url, tg_preproc, get_feed_type
 
 
 requests.adapters.DEFAULT_RETRIES = 5
@@ -44,7 +45,9 @@ def bot_logdebug(update, text):
         now = datetime.now()
         update.message.reply_text('[%d:%d:%d]: %s' % (now.hour, now.minute, now.second, text))
 
-def __verify_feed(url, update=None):
+def __verify_feed(url, update=None, extractor_context=None):
+    if extractor_context is None:
+        extractor_context = {}
     bot_logdebug(update, 'Запрашиваю страницу по ссылке')
     resp = requests.get(url, headers={'User-agent' : USER_AGENT}, timeout=10)
     headers = resp.headers
@@ -58,10 +61,10 @@ def __verify_feed(url, update=None):
         if 'items' not in afeeds.keys():
             bot_logdebug(update, 'RSS ленты не обнаружены. Проверяем наличие новостей на странице')
             f = FeedExtractor(filtered_text_length=150)
-            data, session = f.get_feed(url)
+            data, session = f.get_feed(url, **extractor_context)
             logging.info(data)
             if data and len(data['items']) > 0:
-                feeds.append({'feedtype' : FEED_TYPE_HTML, 'title' : data['title'], 'num' : len(data['items']), 'url' : url})
+                feeds.append({'feedtype' : get_feed_type(data, url), 'title' : data['title'], 'num' : len(data['items']), 'url' : url})
                 bot_logdebug(update, 'На странице найдено и извлечено %d новостей' % (len(data['items'])))
                 return feeds
         else:
@@ -84,10 +87,10 @@ def __verify_feed(url, update=None):
                 return feeds
             bot_logdebug(update, 'Проверяем на наличие новостей в теле HTML страницы')
             ext = FeedExtractor(filtered_text_length=150)
-            data, session = ext.get_feed(url)
+            data, session = ext.get_feed(url, **extractor_context)
             logging.info(data)
             if data and len(data['items']) > 0:
-                feeds.append({'feedtype' : FEED_TYPE_HTML, 'title' : data['title'], 'num' : len(data['items']), 'url' : url})
+                feeds.append({'feedtype' : get_feed_type(data, url), 'title' : data['title'], 'num' : len(data['items']), 'url' : url})
                 bot_logdebug(update, 'На странице найдено и извлечено %d новостей' % (len(data['items'])))
                 return feeds
     elif ctype in ['application/xml', 'application/rss+xml', 'text/xml']:
@@ -128,6 +131,7 @@ def __get_user(update):
         user = User(userid=userid, name=update.effective_user.name)
         user.save()
     return user
+
 
 def helpcmd(bot, update):
     update.message.reply_text(COMMANDS_TEXT)
@@ -182,19 +186,27 @@ def do_leave(bot, update):
 def do_add(bot, update):
     query = update['message']['text']
     user = __get_user(update)
+    extractor_context = {}
+
     parts = query.split(' ')[1:]
-    if len(parts) == 2:
-        chname, url = parts
-        feedtype = 'rss'
-    else:
+    if len(parts) != 2:
         message = u'Должны быть переданы 2 параметра: идентификатор канала и ссылка'
         update.message.reply_text(message)
         return
+
+    chname, url = parts
+    feedtype = 'rss'
+
+    if url.startswith("@"):
+        url = tg_id2url(url)
+        extractor_context["document_preprocessor"] = tg_preproc
+    
     channel = Channel.objects.get(user=user, chid=chname)
     if channel is None:
         message = u"Канал не найден"
+        
     else:
-        feeds = __verify_feed(url, update)
+        feeds = __verify_feed(url, update=update, extractor_context=extractor_context)
         logging.info(str(feeds))
         if len(feeds) == 0:
             message = u"По ссылке %s не удалось найти RSS ленту и извлечь новости" % (url)
@@ -221,16 +233,20 @@ def do_remove(bot, update):
 def do_test(bot, update):
     query = update['message']['text']
     user = __get_user(update)
+    extractor_context = {}
+
     parts = query.split(' ')[1:]
-    if len(parts) == 1:
-        url = parts[0]
-        feedtype = 'rss'
-    else:
+    if(len(parts) != 1):
         message = u'Должен быть передан 1 параметр'
         update.message.reply_text(message)
         return
+    url = parts[0]
+    if url.startswith("@"):
+        url = tg_id2url(url)
+        extractor_context["document_preprocessor"] = tg_preproc
+
     user = __get_user(update)
-    message = str(__verify_feed(url, update))
+    message = str(__verify_feed(url, update=update, extractor_context=extractor_context))
     update.message.reply_text(message)
 
 
@@ -284,7 +300,7 @@ def do_update(bot, update):
 
 
 def start():
-    connect('feedrebot', host='127.0.0.1', port=27017)
+    connect('feedrebot', host=MONGO_HOST, port=MONGO_PORT)
     KEY = open(BOT_KEY, 'r').read().replace("\n", "")
     updater = Updater(KEY)
     updater.dispatcher.add_handler(CommandHandler('help', helpcmd))

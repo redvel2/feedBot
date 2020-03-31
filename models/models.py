@@ -7,6 +7,7 @@ FEED_MODE_FULL = 2
 
 FEED_TYPE_RSS = 10
 FEED_TYPE_HTML = 20
+FEED_TYPE_TG_CHANNEL = 30
 
 class User(Document):
     userid = StringField(required=True, max_length=50, unique=True)

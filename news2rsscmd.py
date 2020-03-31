@@ -21,6 +21,8 @@ from newsworker.extractor import FeedExtractor
 from settings import *
 import feedparser
 
+from utils import get_feed_context
+
 requests.adapters.DEFAULT_RETRIES = 5
 
 
@@ -95,9 +97,11 @@ class FeedManager:
                         p.save()
                         logging.info('Post consumed %s' % (rec_id))
                 f.lastpost_guid = lastpost_guid
-            elif f.feedtype == FEED_TYPE_HTML:
+            elif f.feedtype == FEED_TYPE_HTML or f.feedtype == FEED_TYPE_TG_CHANNEL:
+                ext_context = get_feed_context(f)
+
                 ext = FeedExtractor(filtered_text_length=150)
-                data, session = f.get_feed(f.url)
+                data, session = ext.get_feed(f.url, **ext_context)
                 #            print(feed)
                 if len(data['items']) == 0:
                     logging.info('Empty feed')
@@ -128,7 +132,7 @@ class FeedManager:
             f.save()
 
     def digest(self, username):
-        bot = Bot(open(BOT_KEY, 'r').read())
+        bot = Bot(open(BOT_KEY, 'r').read().replace("\n", ""))
 
         if username is not None and username != 'all':
             try:

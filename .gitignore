@@ -1,2 +1,7 @@
 .vscode/*
 .key_newsbot
+__pycache__/*
+*.pyc
+*.ipynb
+.ipynb_checkpoints/*
+feedrebot.log
