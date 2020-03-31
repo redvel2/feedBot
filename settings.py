@@ -3,6 +3,7 @@ import logging
 import logging.handlers
 import pathlib
 from os import path
+import os
 #logging.basicConfig(
 #        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 #        level=logging.DEBUG)
@@ -11,7 +12,7 @@ from os import path
 
 
 LOG_FILENAME = 'feedrebot.log'
-PROJECT_DIR = pathlib.Path().absolute()
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Set up a specific logger with our desired output level
 logger = logging.getLogger()
