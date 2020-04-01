@@ -109,7 +109,7 @@ class FeedManager:
                     continue
 
                 if f.feedtype == FEED_TYPE_TG_CHANNEL:
-                    items = sorted(items, key=lambda x: x["pub_date"], reverse=True)
+                    items = reversed(items)
 
                 f.last_updated = datetime.now()
                 lastpost_guid = items[0]['unique_id']
