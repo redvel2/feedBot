@@ -109,7 +109,7 @@ class FeedManager:
                     continue
 
                 if f.feedtype == FEED_TYPE_TG_CHANNEL:
-                    items = reversed(items)
+                    items = list(reversed(items))
 
                 f.last_updated = datetime.now()
                 lastpost_guid = items[0]['unique_id']
@@ -134,6 +134,7 @@ class FeedManager:
                         p.isposted = False
                         p.save()
                         logging.info('Post consumed %s' % (rec['unique_id']))
+                f.lastpost_guid = lastpost_guid
             f.save()
 
     def digest(self, username):
