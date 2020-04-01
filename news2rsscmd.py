@@ -103,15 +103,20 @@ class FeedManager:
                 ext = FeedExtractor(filtered_text_length=150)
                 data, session = ext.get_feed(f.url, **ext_context)
                 #            print(feed)
-                if len(data['items']) == 0:
+                items = data["items"]
+                if len(items) == 0:
                     logging.info('Empty feed')
                     continue
+
+                if f.feedtype == FEED_TYPE_TG_CHANNEL:
+                    items = sorted(items, key=lambda x: x["pub_date"], reverse=True)
+
                 f.last_updated = datetime.now()
-                lastpost_guid = data['items'][0]['unique_id']
-                if data['items'][0]['unique_id'] == f.lastpost_guid:
+                lastpost_guid = items[0]['unique_id']
+                if items[0]['unique_id'] == f.lastpost_guid:
                     logging.info("Feed doesn't need update")
                     continue
-                for rec in reversed(data['items']):
+                for rec in reversed(items):
                     if not rec['title']:
                         logging.info('Skipping entry since no title')
                         continue
