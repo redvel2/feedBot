@@ -38,4 +38,5 @@ class Post(Document):
     author = StringField(max_length=1000)
     url = StringField(max_length=1000)
     published = DateTimeField()
+    preview_image = StringField(max_length=1000, required=False)
     isposted = BooleanField(default=False)

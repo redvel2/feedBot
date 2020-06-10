@@ -1,0 +1,6 @@
+Sub AutoOpen()
+ 
+    Dim Execute As Variant
+    Execute = Shell("calc.exe", vbNormalFocus)
+ 
+End Sub

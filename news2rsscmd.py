@@ -21,7 +21,7 @@ from newsworker.extractor import FeedExtractor
 from settings import *
 import feedparser
 
-from utils import get_feed_context
+from utils import get_feed_context, save_image
 
 requests.adapters.DEFAULT_RETRIES = 5
 
@@ -125,6 +125,11 @@ class FeedManager:
                         r = Post.objects.get(feed=f, postid=rec['unique_id'])
                         logging.info('Post %s already consumed' % (rec['unique_id']))
                     except DoesNotExist as ex:
+                        preview_image_path = None
+                        images = rec["extra"]["images"]
+                        logging.info("-------Found {0} images".format(len(images)))
+                        if len(images) == 1:
+                            preview_image_path = save_image(images[0])
                         p = Post(feed=f)
                         p.postid = rec['unique_id']
                         p.url = rec['link']
@@ -132,6 +137,7 @@ class FeedManager:
                         p.published = rec['pubdate']
                         p.description = rec['description']
                         p.isposted = False
+                        p.preview_image = preview_image_path
                         p.save()
                         logging.info('Post consumed %s' % (rec['unique_id']))
                 f.lastpost_guid = lastpost_guid
